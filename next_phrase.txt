@@ -1,0 +1,56 @@
+nextPhrase(t[1],t[2], .., t[n], position)
+{
+   v:=position
+   for i = 1 to n do
+     v:= next(t[i], v)
+   if v == infty then // infty represents after the end of the posting list
+      return [infty, infty]
+   u := v
+   for i := n-1 downto 1 do
+     u := prev(t[i],u)
+   if(v-u == n - 1) then
+     return [u, v]
+   else 
+     return nextPhrase(t[1],t[2], .., t[n], u) 
+}
+
+<cur_doc,cur_pos>
+
+function next(t, current)
+{
+   // P[][] = array of posting list arrays
+   // l[] = array of lengths of these posting lists
+   static c = []; //last index positions for terms 
+
+   if(l[t] == 0 || P[t][l[t]] <= current) then
+       return infty;
+   if( P[t][1] > current) then
+       c[t] := 1;
+       return P[t][c[t]];
+
+   if( c[t] > 1 && P[t][c[t] - 1] <= current ) do
+      low := c[t] -1;
+   else
+      low := 1;
+
+   jump := 1;
+
+   high := low + jump;
+
+   while (high < l[t] && P[t][high] <= current) do
+      low := high;
+      jump := 2*jump;
+      high := low + jump;
+   if(high > l[t]) then
+      high := l[t];
+   c[t] = binarySearch(t, low, high, current)
+   return P[t][c[t]];
+}
+
+
+t1, t2, t3, t4, t5
+
+d1 = [a,b,c,d,e]
+d2 = [a,b,c,d,e]+[q1,q2,q3]
+q = q1, q2, q3
+qx = [w,x,y,z,u]
