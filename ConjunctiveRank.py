@@ -23,7 +23,7 @@ for i in range(0, len(formatted_docs)):
         inverted_index[formatted_docs[i][j]] = [[i+1, j]] if not inverted_index.get(formatted_docs[i][j]) else inverted_index[formatted_docs[i][j]] + [[i+1, j]]
 inverted_index = dict(sorted(inverted_index.items()))
 P = inverted_index
-# print(P)
+print(P)
 ################################################ End of Inverted Index construction ################################################
 
 l = {}
