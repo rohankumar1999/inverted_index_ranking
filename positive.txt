@@ -1,0 +1,79 @@
+For conjunctive queries, docRight and docLeft are implemented as follows:
+For terms we define docRight(t, u) := nextDoc(t, u) and docLeft(t,v) := prevDoc(t,v)
+
+docRight(A AND B, u) := max(docRight(A, u), docRight(B,u))
+docLeft(A AND B, v) := min(docLeft(A,v), docLeft(B,v))
+
+
+where, A and B are single word search terms and u is a position in schema independent inverted index.
+To extend this over to multi-word search terms or phrases and document oriented inverted index, we used our
+implementation of nextPhrase() in place of nextDoc() and prevPhrase() in place of prevDoc(). Here, nextPhrase() returns
+first occurence of the phrase after the current index in the form <docId:pos> form which we extract docId.
+
+Our implementation of docRight:
+def docRight(Q, u):
+    return max([nextPhrase(x.split('_'), u)[0][0] for x in Q])
+
+Our implementation of docLeft:
+def docLeft(Q, u):
+    return min([prevPhrase(x.split('_'), u)[0][0] for x in Q])
+
+Modified definition for next():
+def next(t, current):
+    c = {}
+    if t not in c.keys():
+        c[t] = 0
+    if l[t] == 0 or P[t][l[t]-1] <= current:
+        return [infty, infty]
+    if P[t][0] > current:
+        c[t] = 0
+        return P[t][c[t]]
+    if c[t] > 0 and P[t][c[t]-1] <= current :
+        low = c[t] 
+    else:
+        low = 0
+
+    jump = 1
+    high = low + jump
+    while high < l[t] and P[t][high] <= current: 
+        low = high
+        jump = 2*jump
+        high = low + jump
+    if high > l[t]:
+        high = l[t]
+    c[t] = binarySearch(P[t], low, high, current)
+    return P[t][c[t]]
+
+Modified definition for prev():
+def prev(t, current):
+    c_prev = {}
+    if t not in c_prev.keys():
+        c_prev[t] = l[t]
+    if l[t] == 0 or P[t][0] >= current:
+        return [-infty, -infty]
+    if P[t][l[t]-1] < current:
+        c_prev[t] = l[t]-1
+        return P[t][c_prev[t]]
+    if c_prev[t] < l[t] and P[t][c_prev[t]-1] >= current :
+        high = c_prev[t] 
+    else:
+        high = l[t]-1
+
+    jump = -1
+    low = high + jump
+    while low >=0 and P[t][low] >= current: 
+        high=low
+        jump = 2*jump
+        low = high + jump
+    if low < 0:
+        low = 0
+    c_prev[t] = binarySearch_2(P[t], low, high, current)
+    return P[t][c_prev[t]]
+
+Modified definition for first():
+def first(t):
+    return next(t, [-infty, -infty])
+
+Modified definition for last():
+def last(t):
+    return prev(t, [infty, infty])
