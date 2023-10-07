@@ -17,23 +17,3 @@ nextPhrase(t[1],t[2], .., t[n], position)
       return nextPhrase(t[1],t[2], .., t[n], u)
 }
 
-approach for Part-3:
-inverted_index = {
-   w1: [[doc1,pos], [doc2,pos], [doc2:pos], [doc3,pos]]
-}
-
-
-vocab = d1Ud2Ud3
-idf = N/N(t)
-x1 = tf-idf of d1,t1
-x2 = tf-idf of d1,t2
-D1 = [x1,x2,x3,x4,x5]*|vocab|
-D2 = [y1]*|vocab|
-D3 = []*|vocab|
-q = {} belong to vocab
-
-w1 = tf-idf of q,t1
-log(no.of occurences of t1 in q) x log(N/no.of docs which have t1)
-Q = [w1, w2, w3, w4, w5]
-
-cos(Q,D2)>cos(Q, D1)>cos(Q, D3) = [2, 1, 3][k:]

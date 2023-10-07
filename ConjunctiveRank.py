@@ -25,8 +25,9 @@ for i in range(0, len(formatted_docs)):
 inverted_index = dict(sorted(inverted_index.items()))
 P = inverted_index
 # print(P)
+################################################ End of Inverted Index construction ################################################
 
-#################### TF_IDF #################################
+############################################################ TF_IDF #####################################################
 IndexKeys = inverted_index.keys()
 TF_IDF = {}
 for i in range(10) :
@@ -45,7 +46,7 @@ for term in inverted_index :
         score = (math.log(NumberOfDocOccurence,2) + 1)*(math.log(len(formatted_docs)/len(set([x[0] for x in inverted_index[term]])),2))
         TF_IDF['d' + str(i+1)].append(score)
 # print(TF_IDF)
-############### Query TF_IDF ##########################
+############################################################ Query's TF_IDF ############################################################
 query = {}
 split_Q = []
 for q in Q:
@@ -70,7 +71,6 @@ for term in inverted_index :
     TF_IDF_Q.append(score)
 # print(TF_IDF_Q)
 
-################################################ End of Inverted Index construction ################################################
 
 ################################################ Start Computing Cosine Similarities ################################################
 cos_sim = {}
@@ -87,6 +87,8 @@ print('DocId Score')
 for doc in top_k_docs:
     print(doc[1:], cos_sim[doc])
 ################################################ End Computing Cosine Similarities ################################################
+
+####### Function definitions for next(), prev(), first(), last(), nextPhrase(), prevPhase(), nextSolution(), allSolutions() ######
 
 l = {}
 for key in P.keys():
