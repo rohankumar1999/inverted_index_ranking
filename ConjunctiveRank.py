@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import math
 c = {}
 c_prev = {}
 infty = 9999999999999999
@@ -12,19 +13,80 @@ documents = text_file.read().lower().split("\n\n")
 inverted_index = {}
 num_results = int(sys.argv[2])
 Q = sys.argv[3:]
+Q = [x.lower() for x in Q]
 
 ################################################ Start of Inverted Index construction ################################################
 formatted_docs = []
 for doc in documents:
     formatted_docs.append([x for x in re.split(r'\s+|\d+|\W+', doc) if x])
-
 for i in range(0, len(formatted_docs)):
     for j in range(len(formatted_docs[i])):
         inverted_index[formatted_docs[i][j]] = [[i+1, j]] if not inverted_index.get(formatted_docs[i][j]) else inverted_index[formatted_docs[i][j]] + [[i+1, j]]
 inverted_index = dict(sorted(inverted_index.items()))
 P = inverted_index
-print(P)
+# print(P)
+
+#################### TF_IDF #################################
+IndexKeys = inverted_index.keys()
+TF_IDF = {}
+for i in range(10) :
+    TF_IDF['d' + str(i+1)] = []
+
+for term in inverted_index :
+    for i in range(10) :
+        index = inverted_index[term]
+        NumberOfDocOccurence = 0
+        for each in index :
+            if each[0] == i+1 :
+                NumberOfDocOccurence+=1
+        if NumberOfDocOccurence == 0 :
+            TF_IDF['d' + str(i+1)].append(0)
+            continue
+        score = (math.log(NumberOfDocOccurence,2) + 1)*(math.log(len(formatted_docs)/len(set([x[0] for x in inverted_index[term]])),2))
+        TF_IDF['d' + str(i+1)].append(score)
+# print(TF_IDF)
+############### Query TF_IDF ##########################
+query = {}
+split_Q = []
+for q in Q:
+    split_Q += q.split('_')
+for q in split_Q :
+    if q in query :
+        query[q] +=1
+    else :
+        query[q] = 1
+TF_IDF_Q = []
+# print(query)
+for term in inverted_index :
+    index = inverted_index[term]
+    NumberOfDocOccurence = 0
+    if term in query :
+        NumberOfDocOccurence = query[term]
+    if NumberOfDocOccurence == 0 :
+        TF_IDF_Q.append(0.0)
+        continue
+    score = (math.log(NumberOfDocOccurence,2) + 1)*(math.log(len(formatted_docs)/len(set([x[0] for x in inverted_index[term]])),2))
+    # print(term,len(set([x[0] for x in inverted_index[term]])),NumberOfDocOccurence,score)
+    TF_IDF_Q.append(score)
+# print(TF_IDF_Q)
+
 ################################################ End of Inverted Index construction ################################################
+
+################################################ Start Computing Cosine Similarities ################################################
+cos_sim = {}
+import numpy as np
+def cossim(a,b):
+    a=np.array(a,dtype=np.float32)
+    b=np.array(b,dtype=np.float32)
+    return np.dot(a,b)/np.linalg.norm(a)/np.linalg.norm(b)
+for doc,vector in TF_IDF.items():
+    cos_sim[doc] = cossim(vector, TF_IDF_Q)
+cos_sim = dict(sorted(cos_sim.items(), key=lambda item: -item[1]))
+top_k_docs = list(cos_sim.keys())[:num_results]
+print('DocId Score')
+for doc in top_k_docs:
+    print(doc[1:], cos_sim[doc])
+################################################ End Computing Cosine Similarities ################################################
 
 l = {}
 for key in P.keys():
@@ -181,5 +243,5 @@ def allSolutions(Q):
 # print(nextSolution(Q, [3, 0]))
 # print(nextSolution(Q, [4, 0]))
 # print(nextSolution(Q, [5, 0]))
-print(allSolutions(Q))
+# print(allSolutions(Q))
 # print(binarySearch([[1, 4], [2, 2], [3, 2], [5, 4]], 0, 3, [3,0]))
